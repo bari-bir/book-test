@@ -22,11 +22,15 @@ function App() {
     const { fetchData: fetchQuestionsData } = TestAPI("mbti")
 
     const onAnswer = (answerData: answerInfo) => {
-        setAnswer((answer) => [...answer, answerData])
+        if (isSelectAnswer(answerData.id)) {
+            setAnswer((answer) => answer.filter((ans) => ans.id !== answerData.id))
+        } else {
+            setAnswer((answer) => [...answer, answerData])
+        }
     }
 
     const isSelectAnswer = (id: string) => {
-        return answer.findIndex((item) => item.id === id) !== -1
+        return answer.some((item) => item.id === id)
     }
 
     useEffect(() => {
@@ -67,7 +71,7 @@ function App() {
                                             <span
                                                 key={i}
                                                 onClick={() => onAnswer({ answer: ans, question: item.question, id: item.id })}
-                                                className={`circle ${isSelectAnswer(item.id) ? "active" : i === 2 ? "small" : ""}`}></span>
+                                                className={`circle ${isSelectAnswer(item.id) ? "active" : ""} ${i === 2 ? "small" : ""}`}></span>
                                         ))}
                                     </div>
                                     <p className="answer-text">No</p>

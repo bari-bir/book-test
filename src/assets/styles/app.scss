@@ -53,10 +53,11 @@
 
             .progress-line {
                 display: block;
-                width: 50%;
+                // width: 50%;
                 height: 100%;
                 border-radius: 50px;
                 background: #0281b9;
+                transition: all 0.3s ease;
             }
         }
 
@@ -125,5 +126,18 @@
                 }
             }
         }
+    }
+
+    .btn-finish {
+        margin-top: 30px; 
+        width: 100%;
+        box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+        background: #005479;
+        border-radius: 18px;
+        border: none;
+        height: 54px;
+        font-weight: 500;
+        font-size: 16px;
+        color: #f9faf8;
     }
 }

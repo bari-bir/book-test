@@ -3,6 +3,7 @@ import CloseImg from "./assets/images/close.png"
 import "./assets/styles/app.scss"
 import { MBTIInfo, TestAPI } from "./api/questionsApi"
 import { App as AntApp, Button, Modal } from "antd"
+import ResImg from "./assets/images/res-img.png"
 
 type answerInfo = {
     id: string
@@ -12,8 +13,8 @@ type answerInfo = {
 
 function App() {
     const { fetchData: fetchQuestionsData } = TestAPI("mbti")
-    const { fetchData: fetchCreateAnsData } = TestAPI("answer");
-    const [showRes, setShowRes] = useState<boolean>(false);
+    const { fetchData: fetchCreateAnsData } = TestAPI("answer")
+    const [showRes, setShowRes] = useState<boolean>(false)
     const [answers, setAnswers] = useState<answerInfo[]>([])
     const [info, setInfo] = useState<MBTIInfo>({
         id: "",
@@ -23,7 +24,6 @@ function App() {
         visible: 0,
     })
 
-    
     useEffect(() => {
         fetchQuestionsData({}).then((res) => {
             if (res.result_code === 0) {
@@ -36,33 +36,48 @@ function App() {
     const onAnswer = (answerData: answerInfo) => {
         if (isSelectAnswer(answerData.answer, answerData.id)) {
             setAnswers((answer) => answer.filter((ans) => ans.id !== answerData.id))
+        } else if (answers.findIndex((item) => item.id === answerData.id) !== -1) {
+            setAnswers(
+                (answer) =>
+                    (answer = answer.map((ans) => {
+                        if (ans.id === answerData.id) {
+                            return {
+                                ...ans,
+                                answer: answerData.answer,
+                            }
+                        } else {
+                            return ans
+                        }
+                    })),
+            )
         } else {
             setAnswers((answer) => [...answer, answerData])
         }
     }
 
     const isSelectAnswer = (ans: number, id: string) => {
-        return answers.some((item) => item.answer === ans &&  item.id === id)
+        return answers.some((item) => item.id === id && item.answer === ans)
     }
 
     const procentAns = () => {
-        return Math.floor(answers.length * 100 /  info.questions.length);
+        return Math.floor((answers.length * 100) / info.questions.length)
     }
 
     const onFinish = () => {
         fetchCreateAnsData({
-            questionTestId: "mbti", 
+            questionTestId: "mbti",
             answers,
-        }).then(res => {
-            if(res.result_code ===  0) {
-                setShowRes(true);
+        }).then((res) => {
+            if (res.result_code === 0) {
+                setAnswers([])
+                setShowRes(true)
             }
         })
     }
 
     const onCloseWin = () => {
-        if(window.ReactNativeWebView) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({key: "closeWin"}))
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ key: "closeWin" }))
         }
     }
 
@@ -77,9 +92,9 @@ function App() {
                 </div>
                 <div className="progress-block">
                     <div className="progress">
-                        <span className="progress-line" style={{width: procentAns() + "%"}}></span>
+                        <span className="progress-line" style={{ width: procentAns() + "%" }}></span>
                     </div>
-                    <p className="progress-precent-text" >{procentAns()}%</p>
+                    <p className="progress-precent-text">{procentAns()}%</p>
                 </div>
 
                 <div className="question-wrapper">
@@ -104,12 +119,22 @@ function App() {
                         ))}
                 </div>
 
-                <Button type="primary" className="btn-finish" onClick={onFinish}>Finish</Button>
+                <Button type="primary" className="btn-finish" onClick={onFinish}>
+                    Finish
+                </Button>
             </div>
 
-
-            <Modal open={showRes} className="modal-res" onCancel={() => setShowRes(false)} footer={null}  closeIcon={null}>
-                Great
+            <Modal open={showRes} className="modal-res" onCancel={() => setShowRes(false)} footer={null} closeIcon={null}>
+                <div className="res">
+                    <span className="res-close" onClick={() => setShowRes(false)}>
+                        <img src={CloseImg} alt="close-img" className="close-img" />
+                    </span>
+                    <div className="res-head">
+                        <img src={ResImg} alt="res" className="res-img" />
+                        <h3 className="res-head-title">Your Results</h3>
+                    </div>
+                    <p className="res-text">Books in your genre will be automatically shown to you in recommendations.</p>
+                </div>
             </Modal>
         </AntApp>
     )

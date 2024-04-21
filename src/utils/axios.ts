@@ -77,7 +77,7 @@ async function refreshAccessToken(): Promise<string> {
         .then((res) => {
             if (res.data.result_code === 0 && res.data.data) {
                 localStorage.setItem("token", JSON.stringify(res.data.data))
-                return res.data.data.token
+                return res.data.data.accessToken
             } else {
                 console.error("Somethinh went wrong")
                 throw Error("refresh token faild")

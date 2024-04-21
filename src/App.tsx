@@ -16,6 +16,7 @@ function App() {
     const { fetchData: fetchCreateAnsData } = TestAPI("answer")
     const [showRes, setShowRes] = useState<boolean>(false)
     const [answers, setAnswers] = useState<answerInfo[]>([])
+    const [ans, setAns] = useState<string>("")
     const [info, setInfo] = useState<MBTIInfo>({
         id: "",
         title: "",
@@ -70,6 +71,7 @@ function App() {
         }).then((res) => {
             if (res.result_code === 0) {
                 setAnswers([])
+                setAns(JSON.parse(JSON.stringify(res.data)))
                 setShowRes(true)
             }
         })
@@ -84,17 +86,19 @@ function App() {
     return (
         <AntApp message={{ top: 30 }}>
             <div className="test-page">
-                <div className="head">
-                    <h3 className="head-title">Personality Test</h3>
-                    <span className="head-close" onClick={onCloseWin}>
-                        <img src={CloseImg} alt="close-img" className="close-img" />
-                    </span>
-                </div>
-                <div className="progress-block">
-                    <div className="progress">
-                        <span className="progress-line" style={{ width: procentAns() + "%" }}></span>
+                <div className="header">
+                    <div className="head">
+                        <h3 className="head-title">Personality Test</h3>
+                        <span className="head-close" onClick={onCloseWin}>
+                            <img src={CloseImg} alt="close-img" className="close-img" />
+                        </span>
                     </div>
-                    <p className="progress-precent-text">{procentAns()}%</p>
+                    <div className="progress-block">
+                        <div className="progress">
+                            <span className="progress-line" style={{ width: procentAns() + "%" }}></span>
+                        </div>
+                        <p className="progress-precent-text">{procentAns()}%</p>
+                    </div>
                 </div>
 
                 <div className="question-wrapper">
@@ -119,7 +123,7 @@ function App() {
                         ))}
                 </div>
 
-                <Button type="primary" className="btn-finish" onClick={onFinish}>
+                <Button type="primary" disabled={answers.length !== info.questions.length} className="btn-finish" onClick={onFinish}>
                     Finish
                 </Button>
             </div>
@@ -133,7 +137,7 @@ function App() {
                         <img src={ResImg} alt="res" className="res-img" />
                         <h3 className="res-head-title">Your Results</h3>
                     </div>
-                    <p className="res-text">Books in your genre will be automatically shown to you in recommendations.</p>
+                    <p className="res-text">{ans}</p>
                 </div>
             </Modal>
         </AntApp>

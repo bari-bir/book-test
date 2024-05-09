@@ -17,6 +17,9 @@ function App() {
     const [showRes, setShowRes] = useState<boolean>(false)
     const [answers, setAnswers] = useState<answerInfo[]>([])
     const [ans, setAns] = useState<string>("")
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const questionsPerPage = 4
+
     const [info, setInfo] = useState<MBTIInfo>({
         id: "",
         title: "",
@@ -33,6 +36,10 @@ function App() {
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    const onPageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber)
+    }
 
     const onAnswer = (answerData: answerInfo) => {
         if (isSelectAnswer(answerData.answer, answerData.id)) {
@@ -83,6 +90,12 @@ function App() {
         }
     }
 
+    const indexOfLastQuestion = currentPage * questionsPerPage
+    const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage
+    const currentQuestions = info.questions.slice(indexOfFirstQuestion, indexOfLastQuestion)
+
+    const totalPages = Math.ceil(info.questions.length / questionsPerPage)
+
     return (
         <AntApp message={{ top: 30 }}>
             <div className="test-page">
@@ -102,8 +115,8 @@ function App() {
                 </div>
 
                 <div className="question-wrapper">
-                    {info.questions.length &&
-                        info.questions.map((item) => (
+                    {currentQuestions.length &&
+                        currentQuestions.map((item) => (
                             <div className="question-block" key={item.id}>
                                 <p className="question-text">{item.question}</p>
 
@@ -123,9 +136,33 @@ function App() {
                         ))}
                 </div>
 
-                <Button type="primary" disabled={answers.length !== info.questions.length} className="btn-finish" onClick={onFinish}>
-                    Finish
-                </Button>
+                <div className="pagination">
+                    <Button
+                        type="primary"
+                        style={{ opacity: currentPage === 1 ? 0.4 : 1 }}
+                        className="btns btn-back"
+                        onClick={() => onPageChange(currentPage - 1)}
+                        disabled={currentPage === 1}>
+                        Back
+                    </Button>
+                    <p className="page-count">
+                        Page {currentPage} of {totalPages}
+                    </p>
+                    <Button
+                        type="primary"
+                        className="btns btn-next"
+                        style={{ opacity: indexOfLastQuestion >= info.questions.length ? 0.4 : 1 }}
+                        onClick={() => onPageChange(currentPage + 1)}
+                        disabled={indexOfLastQuestion >= info.questions.length}>
+                        Next
+                    </Button>
+                </div>
+
+                {answers.length === info.questions.length && (
+                    <Button type="primary" className="btn-finish" onClick={onFinish}>
+                        Finish
+                    </Button>
+                )}
             </div>
 
             <Modal open={showRes} className="modal-res" onCancel={() => setShowRes(false)} footer={null} closeIcon={null}>
